@@ -42,11 +42,10 @@ campsite_items = WebDriverWait(driver, 15).until(
 )
 print(f"Found {len(campsite_items)} campsite items")
 
-for campsite in campsite_items:
-   navigate_to_booking(driver,campsite)
-   break
+# for campsite in campsite_items:
+navigate_to_booking(driver,campsite_items[0])
 
-time.sleep(3)
+# time.sleep(3)
 
 print(driver.title)
-driver.quit()
+# driver.quit()
