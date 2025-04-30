@@ -5,6 +5,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import time
 from datetime import datetime, timedelta
+from testMessage import sort_campsites
+from copy import deepcopy
+
 
 
 
@@ -182,7 +185,7 @@ def find_best_booking(driver, title ,min_stay=1, max_stay=7):
         parsed_checkin_dates.sort()
         parsed_checkout_dates.sort()
 
-        best_options = []
+        options = []
 
         for check_in in parsed_checkin_dates:
 
@@ -190,7 +193,7 @@ def find_best_booking(driver, title ,min_stay=1, max_stay=7):
                 stay_nights = (check_out - check_in).days
 
                 if min_stay <= stay_nights <= max_stay and check_out > check_in:
-                     best_options.append({
+                     options.append({
                         "campsite": title,
                         "check_in": check_in,
                         "check_out": check_out,
@@ -199,11 +202,12 @@ def find_best_booking(driver, title ,min_stay=1, max_stay=7):
                         "check_out_str": check_out.strftime("%B %d, %Y")
                     })
         
-        best_options.sort(key=lambda x: (
-            x["check_in"].month != 6,
-            not any(n in x["campsite"] for n in ["14", "15", "16"]),
-            x["check_in"]
-        ))
+        best_options = sort_campsites(deepcopy(options))
+
+        for opt in best_options:
+            print(f"- Campsite {opt['campsite']}, {opt['check_in_str']} to {opt['check_out_str']} ({opt['nights']} nights)")
+
+        print(f"PICKING {best_options[0]}")
 
         if best_options:
             return best_options[0]

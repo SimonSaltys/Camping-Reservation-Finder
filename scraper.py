@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 from scraper_utils import navigate_to_booking
-from discord_utils import send_discord_message
+from discord_utils import process_campsite_results
 from dotenv import load_dotenv
 
 
@@ -109,6 +109,9 @@ def main():
                 print("No more campsites to process or error occurred. Exiting loop.")
                 break
                 
+            
+            
+
             # Small delay between iterations
             time.sleep(2)
             
@@ -121,34 +124,8 @@ def main():
         for i, name in enumerate(checked_campsites):
             print(f"{i+1}. {name}")
 
-            # Create the "Best Campsite Options Found" message
-        message = "**🏕️Best Campsite Options Found:**\n"
-        for i, c in enumerate(best_options[:10], 1):
-            # Check if the campsite is one of the specified ones
-            star = "⭐" if any(num in c['campsite'] for num in ["014", "015", "016"]) else ""
-            message += f"**{i}. {c['campsite']} {star}**\n"
-            message += f"📅 {c['check_in_str']} to {c['check_out_str']} ({c['nights']} nights)\n\n"
+        process_campsite_results(best_options)
 
-    # Truncate if message exceeds 2000 characters
-        if len(message) > 2000:
-            message = message[:1970] + '...'
-
-        # Create the more concise "Other Options Found" message
-        #todo off by 1
-        more_message = "\n"
-        for i, c in enumerate(best_options[10:28], 11):
-            more_message += f"**{i}. {c['campsite']}**{star} ({c['nights']} nights)\n"
-
-
-        # Truncate if more_message exceeds 2000 characters
-        if len(more_message) > 2000:
-            more_message = more_message[:1970] + '...'
-
-        # Send the messages
-        send_discord_message(message)
-        send_discord_message(more_message)
-
-        # Allow time to see results before closing
         time.sleep(5)
         print(driver.title)
         driver.quit()
